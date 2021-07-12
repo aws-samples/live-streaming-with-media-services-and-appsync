@@ -1,0 +1,28 @@
+type Channel @model {
+  id: ID!
+  name: String!
+  url: String!
+  createdAt: String
+  messages: [Message] @connection(keyName: "byChannel", fields: ["id"])
+
+}
+
+enum ModelSortDirection {
+  ASC
+  DESC
+}
+
+type Message @model(subscriptions: null)
+@key(name: "byChannel", fields: ["channelId", "createdAt"], queryField: "listMessagesByChannel")
+{
+  id: ID!
+  channelId: ID!
+  username: String!
+  content: String!
+  createdAt: String
+  channel: Channel @connection(fields: ["channelId"], sortField: "createdAt")
+}
+
+type Subscription {
+  onCreateMessage(channelId: ID): Message @aws_subscribe(mutations: ["createMessage"])
+}
